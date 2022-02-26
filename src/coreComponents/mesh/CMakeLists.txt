@@ -45,7 +45,6 @@ set( mesh_headers
      generators/InternalWellGenerator.hpp
      generators/InternalWellboreGenerator.hpp
      generators/MeshGeneratorBase.hpp
-     generators/ParMETISInterface.hpp
      generators/PartitionDescriptor.hpp
      generators/PrismUtilities.hpp
      generators/WellGeneratorBase.hpp
@@ -109,7 +108,6 @@ set( mesh_sources
      generators/InternalWellGenerator.cpp
      generators/InternalWellboreGenerator.cpp
      generators/MeshGeneratorBase.cpp
-     generators/ParMETISInterface.cpp
      generators/WellGeneratorBase.cpp
      mpiCommunications/CommID.cpp
      mpiCommunications/CommunicationTools.cpp
@@ -129,7 +127,7 @@ set( mesh_sources
      utilities/ComputationalGeometry.cpp
      )
 
-set( dependencyList ${parallelDeps} schema dataRepository constitutive finiteElement parmetis metis )
+set( dependencyList ${parallelDeps} schema dataRepository constitutive finiteElement )
 
 if( ENABLE_VTK )
     message(STATUS "Adding VTKMeshGenerator sources and headers")
@@ -149,6 +147,12 @@ if( ENABLE_VTK )
     if( ENABLE_MPI )
       set( dependencyList ${dependencyList} VTK::IOParallelXML VTK::ParallelMPI )
     endif()
+endif()
+
+if( ENABLE_PARMETIS )
+    set( mesh_headers ${mesh_headers} generators/ParMETISInterface.hpp )
+    set( mesh_sources ${mesh_sources} generators/ParMETISInterface.cpp )
+    set( dependencyList ${dependencyList} parmetis metis )
 endif()
 
 if( ENABLE_SCOTCH )
