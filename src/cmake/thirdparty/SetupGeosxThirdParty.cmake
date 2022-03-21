@@ -239,7 +239,7 @@ if(DEFINED PUGIXML_DIR)
     message( " ----> pugixml_VERSION = ${pugixml_VERSION}")
 
     set(ENABLE_PUGIXML ON CACHE BOOL "")
-    set(thirdPartyLibs ${thirdPartyLibs} pugixml)
+    set(thirdPartyLibs ${thirdPartyLibs} pugixml::pugixml)
 else()
     message(FATAL_ERROR "GEOSX requires pugixml, set PUGIXML_DIR to the pugixml installation directory.")
 endif()
