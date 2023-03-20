@@ -289,8 +289,17 @@ void HDFHistoryIO::write()
         hid_t fileHyperslab = filespace;
         H5Sselect_hyperslab( fileHyperslab, H5S_SELECT_SET, &fileOffset[0], nullptr, &bufferedCounts[0], nullptr );
 
-        H5Dwrite( dataset, m_hdfType, memspace, fileHyperslab, H5P_DEFAULT, dataBuffer );
+#ifdef GEOSX_USE_MPI
+        /*
+        * Create property list for collective dataset write.
+        */
+        plistId = H5Pcreate(H5P_DATASET_XFER);
+        H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
 
+        H5Dwrite( dataset, m_hdfType, memspace, fileHyperslab, plistId, dataBuffer );
+#else
+        H5Dwrite( dataset, m_hdfType, memspace, fileHyperslab, H5P_DEFAULT, dataBuffer );
+#endif
         // forward the data buffer pointer to the start of the next row
         if( dataBuffer )
         {
