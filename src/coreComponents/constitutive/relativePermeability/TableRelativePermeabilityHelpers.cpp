@@ -36,13 +36,16 @@ TableRelativePermeabilityHelpers::validateRelativePermeabilityTable( TableFuncti
   ArrayOfArraysView< real64 const > coords = relPermTable.getCoordinates();
 
   GEOS_THROW_IF_NE_MSG( relPermTable.getInterpolationMethod(), TableFunction::InterpolationType::Linear,
-                        GEOS_FMT( "{}: in table '{}' interpolation method must be linear", fullConstitutiveName, relPermTable.getName() ),
+                        GEOS_FMT( "{}: in table '{}' interpolation method must be linear",
+                                  fullConstitutiveName, relPermTable.getDataContext().toString() ),
                         InputError );
   GEOS_THROW_IF_NE_MSG( relPermTable.numDimensions(), 1,
-                        GEOS_FMT( "{}: table '{}' must have a single independent coordinate", fullConstitutiveName, relPermTable.getName() ),
+                        GEOS_FMT( "{}: table '{}' must have a single independent coordinate",
+                                  fullConstitutiveName, relPermTable.getDataContext().toString() ),
                         InputError );
   GEOS_THROW_IF_LT_MSG( coords.sizeOfArray( 0 ), 2,
-                        GEOS_FMT( "{}: table `{}` must contain at least two values", fullConstitutiveName, relPermTable.getName() ),
+                        GEOS_FMT( "{}: table `{}` must contain at least two values",
+                                  fullConstitutiveName, relPermTable.getDataContext().toString() ),
                         InputError );
 
   arraySlice1d< real64 const > phaseVolFrac = coords[0];
@@ -53,13 +56,15 @@ TableRelativePermeabilityHelpers::validateRelativePermeabilityTable( TableFuncti
 
   // note that the TableFunction class has already checked that coords.sizeOfArray( 0 ) == relPerm.size()
   GEOS_THROW_IF( !isZero( relPerm[0] ),
-                 GEOS_FMT( "{}: in table '{}' the first value must be equal to 0", fullConstitutiveName, relPermTable.getName() ),
+                 GEOS_FMT( "{}: in table '{}' the first value must be equal to 0",
+                           fullConstitutiveName, relPermTable.getDataContext().toString() ),
                  InputError );
   for( localIndex i = 1; i < coords.sizeOfArray( 0 ); ++i )
   {
     // check phase volume fraction
     GEOS_THROW_IF( phaseVolFrac[i] < 0 || phaseVolFrac[i] > 1,
-                   GEOS_FMT( "{}: in table '{}' values must be between 0 and 1", fullConstitutiveName, relPermTable.getName() ),
+                   GEOS_FMT( "{}: in table '{}' values must be between 0 and 1",
+                             fullConstitutiveName, relPermTable.getDataContext().toString() ),
                    InputError );
 
     // note that the TableFunction class has already checked that the coordinates are monotone
@@ -67,7 +72,7 @@ TableRelativePermeabilityHelpers::validateRelativePermeabilityTable( TableFuncti
     // check phase relative permeability
     GEOS_THROW_IF( !isZero( relPerm[i] ) && (relPerm[i] - relPerm[i-1]) < 1e-15,
                    GEOS_FMT( "{}: in table '{}' values must be strictly increasing (|Delta kr| > 1e-15 between two non-zero values)",
-                             fullConstitutiveName, relPermTable.getName() ),
+                             fullConstitutiveName, relPermTable.getDataContext().toString() ),
                    InputError );
 
     if( isZero( relPerm[i-1] ) && !isZero( relPerm[i] ) )
