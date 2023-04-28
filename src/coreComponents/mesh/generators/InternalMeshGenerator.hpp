@@ -344,7 +344,7 @@ private:
           if( ( !isZero( m_nElemBias[i][block] ) ) && (m_nElems[i][block]>1))
           {
             GEOS_ERROR_IF( fabs( m_nElemBias[i][block] ) >= 1,
-                           getWrapperDataContext( i == 0 ? viewKeyStruct::xBiasString()
+                           getWrapperDataContext( i == 0 ? viewKeyStruct::xBiasString() :
                                                   i == 1 ? viewKeyStruct::yBiasString() :
                                                   viewKeyStruct::zBiasString() ) <<
                            ", block index = " << block << " : Mesh bias must between -1 and 1!" );

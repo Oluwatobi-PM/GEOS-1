@@ -102,17 +102,17 @@ void Damage< BASE >::postProcessInput()
   BASE::postProcessInput();
 
   GEOS_ERROR_IF( m_extDrivingForceFlag != 0 && m_extDrivingForceFlag!= 1,
-                 getDataContext() << ": invalid external driving force flag option - must"
-                                     " be 0 or 1" );
+                 BASE::getDataContext() << ": invalid external driving force flag option - must"
+                                           " be 0 or 1" );
   GEOS_ERROR_IF( m_extDrivingForceFlag == 1 && m_tensileStrength <= 0.0,
-                 getDataContext() << ": tensile strength must be input and positive when the"
-                                     " external driving force flag is turned on" );
+                 BASE::getDataContext() << ": tensile strength must be input and positive when the"
+                                           " external driving force flag is turned on" );
   GEOS_ERROR_IF( m_extDrivingForceFlag == 1 && m_compressStrength <= 0.0,
-                 getDataContext() << ": compressive strength must be input and positive when the"
-                                     " external driving force flag is turned on" );
+                 BASE::getDataContext() << ": compressive strength must be input and positive when the"
+                                           " external driving force flag is turned on" );
   GEOS_ERROR_IF( m_extDrivingForceFlag == 1 && m_deltaCoefficient < 0.0,
-                 getDataContext() << ": delta coefficient must be input and non-negative when the"
-                                     " external driving force flag is turned on" );
+                 BASE::getDataContext() << ": delta coefficient must be input and non-negative when the"
+                                           " external driving force flag is turned on" );
 }
 
 template< typename BASE >
