@@ -93,7 +93,7 @@ localIndex AcousticWaveEquationSEM::getNumNodesPerElem()
   FiniteElementDiscretization const * const
   feDiscretization = feDiscretizationManager.getGroupPointer< FiniteElementDiscretization >( m_discretizationName );
   GEOS_THROW_IF( feDiscretization == nullptr,
-                 getWrapperDataContext( viewKeyStruct::discretizationString ) << ": FE discretization " << m_discretizationName << " not found.",
+                 getWrapperDataContext( viewKeyStruct::discretizationString() ) << ": FE discretization " << m_discretizationName << " not found.",
                  InputError );
 
   localIndex numNodesPerElem = 0;

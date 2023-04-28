@@ -284,7 +284,7 @@ void MultiphasePoromechanics::initializePreSubGroups()
   }
 
   GEOS_THROW_IF( m_stabilizationType == StabilizationType::Local,
-                 getWrapperDataContext( viewKeyStruct::stabilizationTypeString ) <<
+                 getWrapperDataContext( viewKeyStruct::stabilizationTypeString() ) <<
                  ": Local stabilization has been disabled temporarily",
                  InputError );
 
