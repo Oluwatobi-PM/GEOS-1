@@ -191,7 +191,8 @@ void ElementRegionManager::generateWells( MeshManager & meshManager,
     globalIndex const numWellElemsGlobal = MpiWrapper::sum( subRegion.size() );
 
     GEOS_ERROR_IF( numWellElemsGlobal != wellGeometry.getNumElements(),
-                   "Invalid partitioning in well " << wellRegion.getDataContext() );
+                   "Invalid partitioning in well " << wellGeometry.getDataContext() <<
+                   ", subregion " << subRegion.getDataContext() );
 
   } );
 

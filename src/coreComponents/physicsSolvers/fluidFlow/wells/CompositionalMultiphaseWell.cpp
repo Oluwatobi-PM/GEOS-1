@@ -268,15 +268,15 @@ template< typename MODEL1_TYPE, typename MODEL2_TYPE >
 void compareMultiphaseModels( MODEL1_TYPE const & lhs, MODEL2_TYPE const & rhs )
 {
   GEOS_THROW_IF_NE_MSG( lhs.numFluidPhases(), rhs.numFluidPhases(),
-                        GEOS_FMT( "{}: Mismatch in number of phases between constitutive models {} and {}",
-                                  getDataContext(), lhs.getName(), rhs.getName() ),
+                        GEOS_FMT( "Mismatch in number of phases between constitutive models {} and {}",
+                                  lhs.getDataContext(), rhs.getDataContext() ),
                         InputError );
 
   for( integer ip = 0; ip < lhs.numFluidPhases(); ++ip )
   {
     GEOS_THROW_IF_NE_MSG( lhs.phaseNames()[ip], rhs.phaseNames()[ip],
-                          GEOS_FMT( "{}: Mismatch in phase names between constitutive models {} and {}",
-                                    getDataContext(), lhs.getName(), rhs.getName() ),
+                          GEOS_FMT( "Mismatch in phase names between constitutive models {} and {}",
+                                    lhs.getDataContext(), rhs.getDataContext() ),
                           InputError );
   }
 }
@@ -285,15 +285,15 @@ template< typename MODEL1_TYPE, typename MODEL2_TYPE >
 void compareMulticomponentModels( MODEL1_TYPE const & lhs, MODEL2_TYPE const & rhs )
 {
   GEOS_THROW_IF_NE_MSG( lhs.numFluidComponents(), rhs.numFluidComponents(),
-                        GEOS_FMT( "{}: Mismatch in number of components between constitutive models {} and {}",
-                                  getDataContext(), lhs.getName(), rhs.getName() ),
+                        GEOS_FMT( "Mismatch in number of components between constitutive models {} and {}",
+                                  lhs.getDataContext(), rhs.getDataContext() ),
                         InputError );
 
   for( integer ic = 0; ic < lhs.numFluidComponents(); ++ic )
   {
     GEOS_THROW_IF_NE_MSG( lhs.componentNames()[ic], rhs.componentNames()[ic],
-                          GEOS_FMT( "{}: Mismatch in component names between constitutive models {} and {}",
-                                    getDataContext(), lhs.getName(), rhs.getName() ),
+                          GEOS_FMT( "Mismatch in component names between constitutive models {} and {}",
+                                    lhs.getDataContext(), rhs.getDataContext() ),
                           InputError );
   }
 }

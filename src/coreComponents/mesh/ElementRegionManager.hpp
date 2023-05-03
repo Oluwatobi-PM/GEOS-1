@@ -1447,8 +1447,10 @@ ElementRegionManager::constructMaterialViewAccessor( string const & viewName,
         }
         else
         {
-          GEOS_ERROR_IF( !allowMissingViews, region.getDataContext() << ": Material " << materialKeyName[k]
-                                                                     << " does not contain " << viewName );
+          GEOS_ERROR_IF( !allowMissingViews,
+                         subRegion.getDataContext() <<
+                         ": Material " << constitutiveRelation.getDataContext() <<
+                         " does not contain " << viewName );
         }
       } );
     }
