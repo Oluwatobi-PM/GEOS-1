@@ -242,7 +242,7 @@ void PeriodicEvent::validate() const
                  GEOS_FMT( "`{}`: This event targets an object that automatically selects the time "
                            "step size. Therefore, `{}` cannot be used here. However, forcing a "
                            "constant time step size can still be achived with `{}`.",
-                           getDataContext().toString(), viewKeyStruct::timeFrequencyString(),
+                           getDataContext(), viewKeyStruct::timeFrequencyString(),
                            EventBase::viewKeyStruct::forceDtString() ),
                  InputError );
   GEOS_THROW_IF( m_cycleFrequency != 1 &&
@@ -250,7 +250,7 @@ void PeriodicEvent::validate() const
                  GEOS_FMT( "`{}`: This event targets an object that automatically selects the time "
                            "step size. Therefore, `{}` cannot be used here. However, forcing a "
                            "constant time step size can still be achived with `{}`.",
-                           getDataContext().toString(), viewKeyStruct::cycleFrequencyString(),
+                           getDataContext(), viewKeyStruct::cycleFrequencyString(),
                            EventBase::viewKeyStruct::forceDtString() ),
                  InputError );
 }
