@@ -121,14 +121,14 @@ void WrapperBase::processInputException( std::exception const & ex,
 {
   xmlWrapper::xmlAttribute const & attribute = targetNode.attribute( getName().c_str() );
   string const inputStr = string( attribute.value() );
-  xmlWrapper::xmlAttributePos const attPos = nodePos.getAttributeLine( inputStr );
+  xmlWrapper::xmlAttributePos const attPos = nodePos.getAttributeLine( attribute.name() );
   std::ostringstream oss;
 
   oss << "***** XML parsing error at node ";
   if( nodePos.isFound() )
   {
     oss << "named " << targetNode.attribute( "name" ).value() << ", attribute " << attribute.name()
-        << '(' << splitPath( attPos.isFound() ? attPos.filePath : nodePos.filePath ).second
+        << " (" << splitPath( attPos.isFound() ? attPos.filePath : nodePos.filePath ).second
         << ", l." << ( attPos.isFound() ? attPos.line : nodePos.line ) << ").";
   }
   else
