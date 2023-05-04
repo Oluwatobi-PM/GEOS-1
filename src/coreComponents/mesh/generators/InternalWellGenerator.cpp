@@ -422,10 +422,13 @@ void InternalWellGenerator::connectPerforationsToWellElements()
     real64 const wellLength = m_nodeDistFromHead[m_elemToNodesMap[iwelemBottom][NodeLocation::BOTTOM]];
 
     GEOS_THROW_IF( m_perfDistFromHead[iperf] > wellLength,
-                   perf.getDataContext() << ": Distance from well perforation to head is larger than well polyline length\n \n" <<
-                   "Here is how the \"distanceFromHead\" keyword is used in the definition of the perforation location: \n" <<
-                   "We start from the well head (top of the well) and we measure the linear distance along the well polyline as we go down the well.\n" <<
-                   "When we reach the distanceFromHead specified by the user, we place a perforation on the well at this location of the polyline, and connect it to the reservoir element that contains this perforation",
+                   perf.getWrapperDataContext(
+                     Perforation::viewKeyStruct::distanceFromHeadString() ) <<
+                   ": Distance from well perforation to head (" << m_perfDistFromHead[iperf] <<
+                   ") is larger than well polyline length (" << wellLength << ")\n \n"
+                   "Here is how the \"distanceFromHead\" keyword is used in the definition of the perforation location: \n"
+                   "We start from the well head (top of the well) and we measure the linear distance along the well polyline as we go down the well.\n"
+                   "When we reach the distanceFromHead specified by the user, we place a perforation on the well at this location of the polyline, and connect it to the reservoir element that contains this perforation.",
                    InputError );
 
     // start binary search
