@@ -109,9 +109,9 @@ TEST( testGroupPath, testGlobalPaths )
                                         "The children of Mesh are: { mesh1 }";
     // checks if the exception contains the expected message
     GEOS_ERROR_IF_EQ_MSG( string( e.what() ).find( expectedMsg ), string::npos,
-                        "The error message was not containing the expected sequence.\n" <<
-                        "  Error message :\n" << e.what() <<
-                        "  expected sequence :\n" << expectedMsg );
+                          "The error message was not containing the expected sequence.\n" <<
+                          "  Error message :\n" << e.what() <<
+                          "  expected sequence :\n" << expectedMsg );
     trowHappened = true;
   }
   // checks if the exception has been thrown as expected

@@ -165,7 +165,7 @@ void FieldSpecificationManager::validateBoundaryConditions( MeshLevel & mesh ) c
         missingSetNames.emplace_back( mapEntry.first );
       }
       GEOS_THROW( GEOS_FMT( "\n{0}: there is/are no set(s) named `{1}` under the {2} `{3}`, check the XML input\n",
-                            fs.getDataContext(), fmt::join( missingSetNames, ", " ), 
+                            fs.getDataContext(), fmt::join( missingSetNames, ", " ),
                             FieldSpecificationBase::viewKeyStruct::objectPathString(), fs.getObjectPath() ),
                   InputError );
     }
