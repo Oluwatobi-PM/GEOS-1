@@ -140,6 +140,14 @@ else()
   set( extraComponentsLinkList ${extraComponentsLinkList} ${geosx_core_libs} )
 endif()
 
+if (TARGET fmt::fmt)
+  set( extraComponentsLinkList ${extraComponentsLinkList} fmt::fmt )
+endif()
+
+if (TARGET fmt)
+  set( extraComponentsLinkList ${extraComponentsLinkList} fmt )
+endif()
+
 blt_add_executable( NAME geosx
                     SOURCES main/main.cpp
                     DEPENDS_ON ${extraComponentsLinkList}
