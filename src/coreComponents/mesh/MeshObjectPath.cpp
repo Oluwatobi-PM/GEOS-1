@@ -211,7 +211,7 @@ void processTokenRecursive( dataRepository::Group const & parentGroup,
   } );
 
   GEOS_THROW_IF( namesInRepository.empty(),
-                 GEOS_FMT( "{0} has no children.", parentGroup.getDataContext().toString()),
+                 GEOS_FMT( "{0} doesn't have any children.", parentGroup.getName()),
                  InputError );
 
   for( string const & inputEntry : stringutilities::tokenize( pathToken, " " ) )
@@ -232,9 +232,9 @@ void processTokenRecursive( dataRepository::Group const & parentGroup,
       }
     }
     GEOS_THROW_IF( !foundMatch,
-                   GEOS_FMT( "{0} has no child named {1}.\n"
-                             "{0} has the following children: {{ {2} }}",
-                             parentGroup.getDataContext().toString(),
+                   GEOS_FMT( "{0} doesn't have a child named {1}.\n"
+                             "{0} have the following children: {{ {2} }}",
+                             parentGroup.getName(),
                              inputEntry,
                              stringutilities::join( namesInRepository, ", " ) ),
                    InputError );
@@ -312,5 +312,19 @@ void MeshObjectPath::printPermutations() const
   std::cout<<std::endl<<std::endl;
 }
 
+bool MeshObjectPath::containsMeshLevel( MeshLevel const & meshLevel ) const
+{
+  bool isMeshLevelInObjectPath = false;
+  string const bodyName = meshLevel.getParent().getParent().getName();
+  string const levelName = meshLevel.getName();
+
+  auto bodyIter = m_pathPermutations.find( bodyName );
+  if( bodyIter != m_pathPermutations.end() )
+  {
+    auto const levelIter = bodyIter->second.find( levelName );
+    isMeshLevelInObjectPath = ( levelIter != bodyIter->second.end() );
+  }
+  return isMeshLevelInObjectPath;
+}
 
 } /* namespace geos */

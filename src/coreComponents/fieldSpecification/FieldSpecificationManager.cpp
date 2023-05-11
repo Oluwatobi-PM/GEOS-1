@@ -84,6 +84,14 @@ void FieldSpecificationManager::validateBoundaryConditions( MeshLevel & mesh ) c
       isTargetSetCreated[setNames[i]] = 0;
     }
 
+    // We have to make sure that the meshLevel is in the target of the boundary conditions
+    // This is important for multi-level simulations, such as high-order wave propagation
+    MeshObjectPath const & objectPath = fs.getMeshObjectPaths();
+    if( !objectPath.containsMeshLevel( mesh ) )
+    {
+      return;
+    }
+
     // Step 2: apply the boundary condition
 
     fs.apply< dataRepository::Group >( mesh,
@@ -165,7 +173,7 @@ void FieldSpecificationManager::validateBoundaryConditions( MeshLevel & mesh ) c
         missingSetNames.emplace_back( mapEntry.first );
       }
       GEOS_THROW( GEOS_FMT( "\n{0}: there is/are no set(s) named `{1}` under the {2} `{3}`.\n",
-                            fs.getWrapperDataContext( FieldSpecificationBase::viewKeyStruct::objectPathString() ), 
+                            fs.getWrapperDataContext( FieldSpecificationBase::viewKeyStruct::objectPathString() ),
                             fmt::join( missingSetNames, ", " ),
                             FieldSpecificationBase::viewKeyStruct::objectPathString(), fs.getObjectPath() ),
                   InputError );
@@ -187,7 +195,7 @@ void FieldSpecificationManager::validateBoundaryConditions( MeshLevel & mesh ) c
         "\n{0}: there is no {1} named `{2}` under the {3} `{4}`.\n";
       string const errorMsg =
         GEOS_FMT( fieldNameNotFoundMessage,
-                  fs.getWrapperDataContext( FieldSpecificationBase::viewKeyStruct::fieldNameString() ), 
+                  fs.getWrapperDataContext( FieldSpecificationBase::viewKeyStruct::fieldNameString() ),
                   FieldSpecificationBase::viewKeyStruct::fieldNameString(),
                   fs.getFieldName(), FieldSpecificationBase::viewKeyStruct::objectPathString(), fs.getObjectPath() );
       if( areAllSetsEmpty )
