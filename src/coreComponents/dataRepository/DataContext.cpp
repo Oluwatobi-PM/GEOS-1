@@ -57,8 +57,8 @@ string GroupContext::toString() const
         dynamic_cast< DataFileContext const & >( parentGroup->getDataContext() );
       if( parentContext.getLine() != xmlWrapper::xmlDocument::npos )
       {
-        path.insert( 0, '/' + parentGroup->getName() + '(' + 
-                     splitPath( parentContext.getFilePath() ).second + 
+        path.insert( 0, '/' + parentGroup->getName() + '(' +
+                     splitPath( parentContext.getFilePath() ).second +
                      ",l." + std::to_string( parentContext.getLine() ) + ')' );
         foundNearestLine=true;
       }

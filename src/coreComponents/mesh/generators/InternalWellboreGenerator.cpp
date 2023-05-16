@@ -275,7 +275,7 @@ void InternalWellboreGenerator::postProcessInput()
     GEOS_ERROR_IF( m_cartesianOuterBoundary >= m_vertices[0].size()-1,
                    GEOS_FMT( "{} must be strictly smaller than the number of radial blocks (equal to {} here)",
                              getWrapperDataContext( viewKeyStruct::cartesianOuterBoundaryString() ),
-                              m_vertices[0].size()-1 ) );
+                             m_vertices[0].size()-1 ) );
 
     // step 2: check that the cartesian inner radius is valid
     bool const isCartesianMappingInnerRadiusSpecified = m_cartesianMappingInnerRadius < 1e98;
