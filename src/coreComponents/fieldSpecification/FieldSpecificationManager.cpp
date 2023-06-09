@@ -69,7 +69,7 @@ void FieldSpecificationManager::validateBoundaryConditions( MeshLevel & mesh ) c
   // loop over all the FieldSpecification of the XML file
   this->forSubGroups< FieldSpecificationBase >( [&] ( FieldSpecificationBase const & fs )
   {
-    localIndex isFieldNameFound = 0;
+    bool isFieldNameFound = false;
     // map from set name to a flag (1 if targetSet empty, 0 otherwise)
     map< string, localIndex > isTargetSetEmpty;
     // map from set name to a flag (1 if targetSet has been created, 0 otherwise)
@@ -119,7 +119,7 @@ void FieldSpecificationManager::validateBoundaryConditions( MeshLevel & mesh ) c
                                                                                      // registered on
                                                                                      // the faceManager...
       {
-        isFieldNameFound = 1;
+        isFieldNameFound = true;
       }
 
       // 2.c) If the target set is not empty, we record it
@@ -130,9 +130,7 @@ void FieldSpecificationManager::validateBoundaryConditions( MeshLevel & mesh ) c
       }
     } );
 
-    // Step 3: MPI synchronization
-
-    isFieldNameFound = MpiWrapper::max( isFieldNameFound );
+    // Step 3: MPI synchronization + sets verification
 
     for( std::pair< string const, localIndex > & mapEntry : isTargetSetEmpty )
     {
@@ -148,10 +146,6 @@ void FieldSpecificationManager::validateBoundaryConditions( MeshLevel & mesh ) c
       }
     }
 
-    for( std::pair< string const, localIndex > & mapEntry : isTargetSetCreated )
-    {
-      mapEntry.second = MpiWrapper::max( mapEntry.second );
-    }
     bool areAllSetsMissing = true;
     for( std::pair< string const, localIndex > & mapEntry : isTargetSetCreated )
     {
@@ -161,7 +155,27 @@ void FieldSpecificationManager::validateBoundaryConditions( MeshLevel & mesh ) c
       }
     }
 
-    // Step 4: issue an error or a warning if the field was not found
+    // Step 4: issue error / warning / info if needed
+
+    if( fs.getLogLevel() >= 2 || ( !isFieldNameFound && fs.getLogLevel() >= 1 ) )
+    {
+      std::set< string > targetFieldNames;
+      fs.apply< dataRepository::Group >( mesh,
+                                         [&]( FieldSpecificationBase const &,
+                                              string const & GEOS_UNUSED_PARAM( setName ),
+                                              SortedArrayView< localIndex const > const & GEOS_UNUSED_PARAM( targetSet ),
+                                              Group & targetGroup,
+                                              string const GEOS_UNUSED_PARAM( fieldName ))
+      {
+        targetGroup.forWrappers( [&]( WrapperBase & wrapper )
+        {
+          targetFieldNames.insert( wrapper.getName() );
+        } );
+      } );
+      GEOS_LOG_RANK_0( GEOS_FMT( "{0} available fields list:\n{{ {1} }}\n",
+                                 fs.getWrapperDataContext( FieldSpecificationBase::viewKeyStruct::fieldNameString() ),
+                                 stringutilities::join( targetFieldNames, ", " ) ) );
+    }
 
     // if all sets are missing, we stop the simulation.
     if( areAllSetsMissing )
@@ -189,15 +203,16 @@ void FieldSpecificationManager::validateBoundaryConditions( MeshLevel & mesh ) c
                                     fs.getDataContext(), mapEntry.first, fs.getObjectPath() ) );
     }
 
-    if( isFieldNameFound == 0 )
+    if( !isFieldNameFound )
     {
-      char const fieldNameNotFoundMessage[] =
-        "\n{0}: there is no {1} named `{2}` under the {3} `{4}`.\n";
+      string fieldNameNotFoundMessage = "\n{0}: there is no {1} named `{2}` under the {3} `{4}`.\n";
+
       string const errorMsg =
         GEOS_FMT( fieldNameNotFoundMessage,
                   fs.getWrapperDataContext( FieldSpecificationBase::viewKeyStruct::fieldNameString() ),
                   FieldSpecificationBase::viewKeyStruct::fieldNameString(),
-                  fs.getFieldName(), FieldSpecificationBase::viewKeyStruct::objectPathString(), fs.getObjectPath() );
+                  fs.getFieldName(), FieldSpecificationBase::viewKeyStruct::objectPathString(),
+                  fs.getObjectPath() );
       if( areAllSetsEmpty )
       {
         GEOS_LOG_RANK_0( errorMsg );
