@@ -31,5 +31,7 @@ Wellbore Problems
 
    casedContactElasticWellbore/Example
 
+   casedContactThermoElasticWellbore/Example
+
 
 
