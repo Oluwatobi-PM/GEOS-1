@@ -13,11 +13,11 @@
  */
 
 /**
- * @file CompositionalMultiphaseFluid.hpp
+ * @file CompositionalMultiphaseFluidPVT.hpp
  */
 
-#ifndef GEOS_CONSTITUTIVE_FLUID_MULTIFLUID_COMPOSITIONAL_COMPOSITIONALMULTIPHASEFLUID_HPP_
-#define GEOS_CONSTITUTIVE_FLUID_MULTIFLUID_COMPOSITIONAL_COMPOSITIONALMULTIPHASEFLUID_HPP_
+#ifndef GEOS_CONSTITUTIVE_FLUID_MULTIFLUID_COMPOSITIONAL_COMPOSITIONALMULTIPHASEFLUIDPVT_HPP_
+#define GEOS_CONSTITUTIVE_FLUID_MULTIFLUID_COMPOSITIONAL_COMPOSITIONALMULTIPHASEFLUIDPVT_HPP_
 
 #include "constitutive/fluid/multifluid/MultiFluidBase.hpp"
 #include "constitutive/fluid/multifluid/MultiFluidUtils.hpp"
@@ -28,7 +28,8 @@ namespace geos
 {
 namespace constitutive
 {
-
+namespace pvt
+{
 class CompositionalMultiphaseFluid : public MultiFluidBase
 {
 public:
@@ -434,8 +435,10 @@ CompositionalMultiphaseFluid::KernelWrapper::
            m_totalDensity( k, q ) );
 }
 
+} /* namespace pvt */
+
 } /* namespace constitutive */
 
 } /* namespace geos */
 
-#endif //GEOS_CONSTITUTIVE_FLUID_COMPOSITIONALMULTIPHASEFLUID_HPP_
+#endif //GEOS_CONSTITUTIVE_FLUID_COMPOSITIONALMULTIPHASEFLUIDPVT_HPP_

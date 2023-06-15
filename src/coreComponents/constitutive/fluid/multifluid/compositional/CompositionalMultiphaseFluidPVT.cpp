@@ -34,6 +34,9 @@ using namespace dataRepository;
 namespace constitutive
 {
 
+namespace pvt
+{
+
 CompositionalMultiphaseFluid::CompositionalMultiphaseFluid( string const & name, Group * const parent )
   : MultiFluidBase( name, parent )
 {
@@ -209,6 +212,8 @@ CompositionalMultiphaseFluid::createKernelWrapper()
 }
 
 REGISTER_CATALOG_ENTRY( ConstitutiveBase, CompositionalMultiphaseFluid, string const &, Group * const )
+
+} // namespace pvt
 
 } // namespace constitutive
 

@@ -50,6 +50,8 @@ set( constitutive_headers
      fluid/multifluid/CO2Brine/functions/CO2EOSSolver.hpp
      fluid/multifluid/CO2Brine/functions/PureWaterProperties.hpp
      fluid/multifluid/CO2Brine/functions/WaterDensity.hpp
+     fluid/multifluid/compositional/CompositionalMultiphaseFluid.hpp
+     fluid/multifluid/compositional/CompositionalMultiphaseFluidUpdates.hpp
      fluid/multifluid/compositional/functions/CompositionalProperties.hpp     
      fluid/multifluid/compositional/functions/CubicEOSPhaseModel.hpp     
      fluid/multifluid/compositional/functions/RachfordRice.hpp
@@ -182,6 +184,9 @@ set( constitutive_sources
      fluid/multifluid/CO2Brine/functions/CO2EOSSolver.cpp
      fluid/multifluid/CO2Brine/functions/PureWaterProperties.cpp
      fluid/multifluid/CO2Brine/functions/WaterDensity.cpp
+     fluid/multifluid/compositional/CompositionalMultiphaseFluid.cpp
+     fluid/multifluid/compositional/CompositionalMultiphaseFluidUpdates.cpp
+     fluid/multifluid/compositional/PVTDriverRunTestCompositionalMultiphaseFluid.cpp
      fluid/multifluid/compositional/functions/CompositionalProperties.cpp
      fluid/multifluid/compositional/functions/RachfordRice.cpp          
      fluid/multifluid/reactive/ReactiveBrineFluid.cpp
@@ -251,19 +256,7 @@ set( constitutive_sources
 set( dependencyList ${parallelDeps} events dataRepository functions denseLinearAlgebra )
 
 if( ENABLE_PVTPackage )
-    set( constitutive_headers
-         ${constitutive_headers}
-         fluid/multifluid/compositional/CompositionalMultiphaseFluid.hpp
-         )
-
-    set( constitutive_sources
-         ${constitutive_sources}
-         fluid/multifluid/compositional/CompositionalMultiphaseFluid.cpp
-	 fluid/multifluid/compositional/PVTDriverRunTestCompositionalMultiphaseFluid.cpp	 
-         )
-
     add_subdirectory( PVTPackage )
-
     set( dependencyList ${dependencyList} PVTPackage )
 endif()
 

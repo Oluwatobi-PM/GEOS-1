@@ -22,11 +22,9 @@
 #include "constitutive/fluid/multifluid/blackOil/DeadOilFluid.hpp"
 #include "constitutive/fluid/multifluid/blackOil/BlackOilFluid.hpp"
 #include "constitutive/fluid/multifluid/CO2Brine/CO2BrineFluid.hpp"
+#include "constitutive/fluid/multifluid/compositional/CompositionalMultiphaseFluid.hpp"
 
 #include "common/GeosxConfig.hpp"
-#ifdef GEOSX_USE_PVTPackage
-#include "constitutive/fluid/multifluid/compositional/CompositionalMultiphaseFluid.hpp"
-#endif
 
 namespace geos
 {
@@ -40,9 +38,7 @@ void constitutiveUpdatePassThru( MultiFluidBase const & fluid,
 {
   ConstitutivePassThruHandler< DeadOilFluid,
                                BlackOilFluid,
-#ifdef GEOSX_USE_PVTPackage
                                CompositionalMultiphaseFluid,
-#endif
                                CO2BrinePhillipsFluid,
                                CO2BrineEzrokhiFluid,
                                CO2BrinePhillipsThermalFluid
@@ -57,9 +53,7 @@ void constitutiveUpdatePassThru( MultiFluidBase & fluid,
 {
   ConstitutivePassThruHandler< DeadOilFluid,
                                BlackOilFluid,
-#ifdef GEOSX_USE_PVTPackage
                                CompositionalMultiphaseFluid,
-#endif
                                CO2BrinePhillipsFluid,
                                CO2BrineEzrokhiFluid,
                                CO2BrinePhillipsThermalFluid

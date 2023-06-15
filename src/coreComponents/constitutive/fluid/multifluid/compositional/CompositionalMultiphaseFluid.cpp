@@ -17,14 +17,7 @@
  */
 
 #include "CompositionalMultiphaseFluid.hpp"
-
-#include "codingUtilities/Utilities.hpp"
 #include "constitutive/fluid/multifluid/CO2Brine/functions/PVTFunctionHelpers.hpp"
-
-#include "pvt/pvt.hpp"
-
-#include <map>
-#include <utility>
 
 namespace geos
 {
@@ -76,20 +69,6 @@ void CompositionalMultiphaseFluid::postProcessInput()
 {
   MultiFluidBase::postProcessInput();
 
-  auto const getPVTPackagePhaseType = [&]( string const & phaseName )
-  {
-    static map< string, pvt::PHASE_TYPE > const phaseTypes
-    {
-      { "gas", pvt::PHASE_TYPE::GAS },
-      { "oil", pvt::PHASE_TYPE::OIL },
-      { "water", pvt::PHASE_TYPE::LIQUID_WATER_RICH }
-    };
-    return findOption( phaseTypes, phaseName, viewKeyStruct::phaseNamesString(), getFullName() );
-  };
-
-  m_phaseTypes.resize( numFluidPhases() );
-  std::transform( m_phaseNames.begin(), m_phaseNames.end(), m_phaseTypes.begin(), getPVTPackagePhaseType );
-
   integer const NC = numFluidComponents();
   integer const NP = numFluidPhases();
 
@@ -100,6 +79,7 @@ void CompositionalMultiphaseFluid::postProcessInput()
                           InputError );
 
   };
+
   checkInputSize( m_equationsOfState, NP, viewKeyStruct::equationsOfStateString() );
   checkInputSize( m_componentCriticalPressure, NC, viewKeyStruct::componentCriticalPressureString() );
   checkInputSize( m_componentCriticalTemperature, NC, viewKeyStruct::componentCriticalTemperatureString() );
@@ -127,85 +107,38 @@ void CompositionalMultiphaseFluid::initializePostSubGroups()
   createFluid();
 }
 
-void CompositionalMultiphaseFluid::createFluid()
-{
-  auto const getCompositionalEosType = [&]( string const & name )
-  {
-    static map< string, pvt::EOS_TYPE > const eosTypes =
-    {
-      { "PR", pvt::EOS_TYPE::PENG_ROBINSON },
-      { "SRK", pvt::EOS_TYPE::REDLICH_KWONG_SOAVE }
-    };
-    return findOption( eosTypes, name, viewKeyStruct::phaseNamesString(), getFullName() );
-  };
-
-  std::vector< pvt::EOS_TYPE > eos( numFluidPhases() );
-  std::transform( m_equationsOfState.begin(), m_equationsOfState.end(), eos.begin(), getCompositionalEosType );
-
-  std::vector< pvt::PHASE_TYPE > phases( m_phaseTypes.begin(), m_phaseTypes.end() );
-  std::vector< string > const components( m_componentNames.begin(), m_componentNames.end() );
-  std::vector< double > const Mw( m_componentMolarWeight.begin(), m_componentMolarWeight.end() );
-  std::vector< double > const Tc( m_componentCriticalTemperature.begin(), m_componentCriticalTemperature.end() );
-  std::vector< double > const Pc( m_componentCriticalPressure.begin(), m_componentCriticalPressure.end() );
-  std::vector< double > const Omega( m_componentAcentricFactor.begin(), m_componentAcentricFactor.end() );
-
-  m_fluid = pvt::MultiphaseSystemBuilder::buildCompositional( pvt::COMPOSITIONAL_FLASH_TYPE::NEGATIVE_OIL_GAS, phases, eos,
-                                                              components, Mw, Tc, Pc, Omega );
-}
-
 std::unique_ptr< ConstitutiveBase >
 CompositionalMultiphaseFluid::deliverClone( string const & name,
                                             Group * const parent ) const
 {
   std::unique_ptr< ConstitutiveBase > clone = MultiFluidBase::deliverClone( name, parent );
   CompositionalMultiphaseFluid & fluid = dynamicCast< CompositionalMultiphaseFluid & >( *clone );
-  fluid.m_phaseTypes = m_phaseTypes;
   fluid.createFluid();
   return clone;
 }
 
-CompositionalMultiphaseFluid::KernelWrapper::
-  KernelWrapper( pvt::MultiphaseSystem & fluid,
-                 arrayView1d< pvt::PHASE_TYPE > const & phaseTypes,
-                 arrayView1d< geos::real64 const > const & componentMolarWeight,
-                 bool useMass,
-                 PhaseProp::ViewType phaseFraction,
-                 PhaseProp::ViewType phaseDensity,
-                 PhaseProp::ViewType phaseMassDensity,
-                 PhaseProp::ViewType phaseViscosity,
-                 PhaseProp::ViewType phaseEnthalpy,
-                 PhaseProp::ViewType phaseInternalEnergy,
-                 PhaseComp::ViewType phaseCompFraction,
-                 FluidProp::ViewType totalDensity )
-  : MultiFluidBase::KernelWrapper( componentMolarWeight,
-                                   useMass,
-                                   std::move( phaseFraction ),
-                                   std::move( phaseDensity ),
-                                   std::move( phaseMassDensity ),
-                                   std::move( phaseViscosity ),
-                                   std::move( phaseEnthalpy ),
-                                   std::move( phaseInternalEnergy ),
-                                   std::move( phaseCompFraction ),
-                                   std::move( totalDensity ) ),
-  m_fluid( fluid ),
-  m_phaseTypes( phaseTypes )
+void CompositionalMultiphaseFluid::createFluid()
 {}
 
 CompositionalMultiphaseFluid::KernelWrapper
 CompositionalMultiphaseFluid::createKernelWrapper()
 {
-  return KernelWrapper( *m_fluid,
-                        m_phaseTypes,
-                        m_componentMolarWeight,
-                        m_useMass,
-                        m_phaseFraction.toView(),
-                        m_phaseDensity.toView(),
-                        m_phaseMassDensity.toView(),
-                        m_phaseViscosity.toView(),
-                        m_phaseEnthalpy.toView(),
-                        m_phaseInternalEnergy.toView(),
-                        m_phaseCompFraction.toView(),
-                        m_totalDensity.toView() );
+  return CompositionalMultiphaseFluidUpdates::createKernelWrapper(
+    m_useMass,
+    m_componentMolarWeight,
+    m_componentCriticalPressure,
+    m_componentCriticalTemperature,
+    m_componentAcentricFactor,
+    m_componentVolumeShift,
+    m_componentBinaryCoeff,
+    m_phaseFraction.toView(),
+    m_phaseDensity.toView(),
+    m_phaseMassDensity.toView(),
+    m_phaseViscosity.toView(),
+    m_phaseEnthalpy.toView(),
+    m_phaseInternalEnergy.toView(),
+    m_phaseCompFraction.toView(),
+    m_totalDensity.toView() );
 }
 
 REGISTER_CATALOG_ENTRY( ConstitutiveBase, CompositionalMultiphaseFluid, string const &, Group * const )

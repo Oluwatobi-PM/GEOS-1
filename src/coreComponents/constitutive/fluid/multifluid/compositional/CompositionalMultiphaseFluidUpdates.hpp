@@ -12,14 +12,17 @@
  * ------------------------------------------------------------------------------------------------------------
  */
 
-/*
- * PVTDriverRunTestCompositionalMultiphaseFluid.cpp
+/**
+ * @file CompositionalMultiphaseFluidUpdates.hpp
  */
 
-#include "constitutive/fluid/multifluid/PVTDriverRunTest.hpp"
-#include "constitutive/fluid/multifluid/compositional/CompositionalMultiphaseFluid.hpp"
+#ifndef GEOS_CONSTITUTIVE_FLUID_MULTIFLUID_COMPOSITIONAL_COMPOSITIONALMULTIPHASEFLUIDUPDATES_HPP_
+#define GEOS_CONSTITUTIVE_FLUID_MULTIFLUID_COMPOSITIONAL_COMPOSITIONALMULTIPHASEFLUIDUPDATES_HPP_
 
 namespace geos
 {
-template void PVTDriver::runTest< constitutive::CompositionalMultiphaseFluid >( constitutive::CompositionalMultiphaseFluid &, arrayView2d< real64 > const & );
-}
+namespace constitutive
+{} /* namespace constitutive */
+} /* namespace geos */
+
+#endif //GEOS_CONSTITUTIVE_FLUID_COMPOSITIONALMULTIPHASEFLUIDUPDATES_HPP_
