@@ -73,11 +73,9 @@ public:
     m_levelRestrictType[1]     = MGRRestrictionType::injection;
     m_levelCoarseGridMethod[1] = MGRCoarseGridMethod::cprLikeBlockDiag;
 
-#if GEOS_USE_HYPRE_DEVICE != GEOS_USE_HYPRE_HIP
     // ILU smoothing for the system made of pressure and densities (except the last one)
     m_levelSmoothType[1]  = 16;
     m_levelSmoothIters[1] = 1;
-#endif
   }
 
   /**
