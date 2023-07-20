@@ -333,7 +333,7 @@ endif()
 ################################
 # Adiak
 ################################
-if(DEFINED ADIAK_DIR)
+if(DEFINED ADIAK_DIR AND ENABLE_ADIAK)
     message(STATUS "ADIAK_DIR = ${ADIAK_DIR}")
 
     find_package(adiak REQUIRED
@@ -372,7 +372,7 @@ endif()
 ################################
 # Caliper
 ################################
-if(DEFINED CALIPER_DIR)
+if(DEFINED CALIPER_DIR AND ENABLE_CALIPER)
     message(STATUS "CALIPER_DIR = ${CALIPER_DIR}")
 
     find_package(caliper REQUIRED
@@ -595,7 +595,7 @@ if(DEFINED HYPRE_DIR AND ENABLE_HYPRE)
         set( HYPRE_DEPENDS ${HYPRE_DEPENDS} superlu_dist )
     endif()
     if( ${ENABLE_HYPRE_DEVICE} STREQUAL "CUDA" )
-        set( EXTRA_LIBS ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_curand_LIBRARY} )
+        set( EXTRA_LIBS ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_curand_LIBRARY} ${CUDA_cusolver_LIBRARY} )
     elseif( ${ENABLE_HYPRE_DEVICE} STREQUAL "HIP" )
         find_package( rocblas REQUIRED )
         find_package( rocsolver REQUIRED )
@@ -875,4 +875,3 @@ if ( ENABLE_CUDA AND ENABLE_CUDA_NVTOOLSEXT )
 endif()
 
 message(STATUS "thirdPartyLibs = ${thirdPartyLibs}")
-

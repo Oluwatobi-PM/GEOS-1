@@ -126,7 +126,7 @@ void HypreExport::exportCRS( HypreMatrix const & mat,
   // import on target rank if needed, or extract diag+offd part in each rank
   hypre_CSRMatrix * const localMatrix = m_targetRank < 0
                                       ? hypre_MergeDiagAndOffd( mat.unwrapped() )
-                                      : hypre_ParCSRMatrixToCSRMatrixAll( mat.unwrapped() );
+                                      : hypre_ParCSRMatrixToCSRMatrixAll( mat.unwrapped(), HYPRE_MEMORY_HOST );
   GEOS_ERROR_IF( rank == m_targetRank && !localMatrix, "HypreExport: matrix is empty on target rank" );
 
   if( m_targetRank < 0 || m_targetRank == rank )

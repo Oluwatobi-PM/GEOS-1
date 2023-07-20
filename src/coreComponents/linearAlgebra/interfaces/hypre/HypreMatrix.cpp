@@ -1327,7 +1327,7 @@ void HypreMatrix::write( string const & filename,
       {
         // Copy distributed parcsr matrix in a local CSR matrix on every process with at least one row
         // Warning: works for a parcsr matrix that is smaller than 2^31-1
-        hypre_CSRMatrix * const fullMatrix = hypre_ParCSRMatrixToCSRMatrixAll( m_parcsr_mat );
+        hypre_CSRMatrix * const fullMatrix = hypre_ParCSRMatrixToCSRMatrixAll( m_parcsr_mat, HYPRE_MEMORY_HOST );
 
         // Identify the smallest process where CSRmatrix exists
         int const printRank = MpiWrapper::min( fullMatrix ? rank : MpiWrapper::commSize( comm() ), comm() );
