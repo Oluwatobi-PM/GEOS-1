@@ -294,7 +294,6 @@ struct DampingMatrixKernel
    * @param[in] facesDomainBoundaryIndicator flag equal to 1 if the face is on the boundary, and to 0 otherwise
    * @param[in] freeSurfaceFaceIndicator flag equal to 1 if the face is on the free surface, and to 0 otherwise
    * @param[in] velocity cell-wise velocity
-   * @param[in] nodeToDampingIdx nodes to damping index mapping
    * @param[out] dampingx diagonal of the damping matrix in x direction
    * @param[out] dampingy diagonal of the damping matrix in y direction
    * @param[out] dampingz diagonal of the damping matrix in z direction
@@ -312,7 +311,6 @@ struct DampingMatrixKernel
           arrayView1d< real32 const > const density,
           arrayView1d< real32 const > const velocityVp,
           arrayView1d< real32 const > const velocityVs,
-          arrayView1d< localIndex > const nodeToDampingIdx,
           arrayView1d< real32 > const dampingx,
           arrayView1d< real32 > const dampingy,
           arrayView1d< real32 > const dampingz )
@@ -354,9 +352,9 @@ struct DampingMatrixKernel
             q,
             xLocal );
 
-          RAJA::atomicAdd< ATOMIC_POLICY >( &dampingx[nodeToDampingIdx[facesToNodes[f][q]]], localIncrementx );
-          RAJA::atomicAdd< ATOMIC_POLICY >( &dampingy[nodeToDampingIdx[facesToNodes[f][q]]], localIncrementy );
-          RAJA::atomicAdd< ATOMIC_POLICY >( &dampingz[nodeToDampingIdx[facesToNodes[f][q]]], localIncrementz );
+          RAJA::atomicAdd< ATOMIC_POLICY >( &dampingx[facesToNodes[f][q]], localIncrementx );
+          RAJA::atomicAdd< ATOMIC_POLICY >( &dampingy[facesToNodes[f][q]], localIncrementy );
+          RAJA::atomicAdd< ATOMIC_POLICY >( &dampingz[facesToNodes[f][q]], localIncrementz );
         }
       }
     } ); // end loop over element

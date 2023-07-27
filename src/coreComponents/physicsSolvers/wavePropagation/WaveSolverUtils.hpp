@@ -305,8 +305,7 @@ struct WaveSolverUtils
                        arrayView1d< real32 const > mass,
                        arrayView1d< real32 > stiffnessVector,
                        arrayView1d< real32 > rhs,
-                       arrayView1d< localIndex > dampingNodes,
-                       arrayView1d< real32 > dampingVector,
+                       arrayView1d< real32 > damping,
                        real64 dt,
                        parallelDeviceStream & stream,
                        parallelDeviceEvents & events )
@@ -326,36 +325,31 @@ struct WaveSolverUtils
     {
       if( freeSurfaceNodeIndicator[a] != 1 )
       {
-        p_np1[a] = mass[a];
-      }
-    } ) );
-
-    events.emplace_back( forAll< EXEC_POLICY >( stream, dampingVector.size(), [=] GEOS_HOST_DEVICE ( localIndex const b )
-    {
-      int a = dampingNodes[b];
-      p_np1[a] += -0.5*dt*dampingVector[b];
-    } ) );
-
-    events.emplace_back( forAll< EXEC_POLICY >( stream, nodeManager.size(), [=] GEOS_HOST_DEVICE ( localIndex const a )
-    {
-      if( freeSurfaceNodeIndicator[a] != 1 )
-      {
-        p_np1[a] *= -p_nm1[a];
-        p_np1[a] += p_n[a]*2.0*mass[a];
+        p_np1[a] = p_n[a];
+        p_np1[a] *= 2.0*mass[a];
+        p_np1[a] -= (mass[a]-0.5*dt*damping[a])*p_nm1[a];
         p_np1[a] += dt2*(rhs[a]-stiffnessVector[a]);
-        p_np1[a] /= mass[a];
+        p_np1[a] /= mass[a]+0.5*dt*damping[a];
       }
-    } ) );
-
-    events.emplace_back( forAll< EXEC_POLICY >( stream, dampingVector.size(), [=] GEOS_HOST_DEVICE ( localIndex const b )
-    {
-      int a = dampingNodes[b];
-      p_np1[a] *= mass[a];
-      p_np1[a] /= (mass[a]+0.5*dt*dampingVector[b]);
     } ) );
   }
 
+  template< typename T, typename PERMUTATION, int USD >
+  static void copyToDeviceArray( Array< T, 2, PERMUTATION > & dst,
+                                 ArrayView< T const, 2, USD > const & src ) {
+    dst.resizeWithoutInitializationOrDestruction( LvArray::MemorySpace::cuda, src.size( 0 ), src.size ( 1 ) );
+    LvArray::memcpy( dst.toSlice(), src.toSliceConst() );
+  }
+
+  template< typename T, typename PERMUTATION, int USD >
+  static void copyToDeviceArray( Array< T, 1, PERMUTATION > & dst,
+                                 ArrayView< T const, 1, USD > const & src ) {
+    dst.resizeWithoutInitializationOrDestruction( LvArray::MemorySpace::cuda, src.size( 0 ) );
+    LvArray::memcpy( dst.toSlice(), src.toSliceConst() );
+  }
+
 };
+
 } /* namespace geos */
 
 #endif /* GEOS_PHYSICSSOLVERS_WAVEPROPAGATION_WAVESOLVERUTILS_HPP_ */

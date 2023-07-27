@@ -248,13 +248,34 @@ DECLARE_FIELD( Mu,
                WRITE_AND_READ,
                "Second Lame parameter: mu" );
 
-DECLARE_FIELD( NodeToDampingIndex,
-               "nodeToDampingIndex",
-               array1d< localIndex >,
-               -1,
+DECLARE_FIELD( DampingVector,
+               "dampingVector",
+               array1d< real32 >,
+               0,
                NOPLOT,
                WRITE_AND_READ,
-               "Index of the damping node (-1 if not damping)." );
+               "Diagonal of the Damping Matrix." );
+DECLARE_FIELD( DampingVectorX,
+               "dampingVector",
+               array1d< real32 >,
+               0,
+               NOPLOT,
+               WRITE_AND_READ,
+               "Diagonal of the Damping Matrix." );
+DECLARE_FIELD( DampingVectorY,
+               "dampingVector",
+               array1d< real32 >,
+               0,
+               NOPLOT,
+               WRITE_AND_READ,
+               "Diagonal of the Damping Matrix." );
+DECLARE_FIELD( DampingVectorZ,
+               "dampingVector",
+               array1d< real32 >,
+               0,
+               NOPLOT,
+               WRITE_AND_READ,
+               "Diagonal of the Damping Matrix." );
 
 }
 

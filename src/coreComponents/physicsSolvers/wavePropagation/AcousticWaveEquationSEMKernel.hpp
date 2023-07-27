@@ -259,8 +259,7 @@ struct DampingMatrixKernel
    * @param[in] facesDomainBoundaryIndicator flag equal to 1 if the face is on the boundary, and to 0 otherwise
    * @param[in] freeSurfaceFaceIndicator flag equal to 1 if the face is on the free surface, and to 0 otherwise
    * @param[in] velocity cell-wise velocity
-   * @param[in] nodeToDampingIdx Node to damping index
-   * @param[out] dampingTerms diagonal of the damping matrix
+   * @param[out] damping diagonal of the damping matrix
    */
   template< typename EXEC_POLICY, typename ATOMIC_POLICY >
   void
@@ -271,8 +270,7 @@ struct DampingMatrixKernel
           arrayView1d< integer const > const facesDomainBoundaryIndicator,
           arrayView1d< localIndex const > const freeSurfaceFaceIndicator,
           arrayView1d< real32 const > const velocity,
-          arrayView1d< localIndex const > nodeToDampingIdx,
-          arrayView1d< real32 > const dampingTerms )
+          arrayView1d< real32 > const damping )
   {
     forAll< EXEC_POLICY >( size, [=] GEOS_HOST_DEVICE ( localIndex const f )
     {
@@ -301,7 +299,7 @@ struct DampingMatrixKernel
         for( localIndex q = 0; q < numNodesPerFace; ++q )
         {
           real32 const localIncrement = alpha * m_finiteElement.computeDampingTerm( q, xLocal );
-          RAJA::atomicAdd< ATOMIC_POLICY >( &dampingTerms[nodeToDampingIdx[facesToNodes[f][q]]], localIncrement );
+          RAJA::atomicAdd< ATOMIC_POLICY >( &damping[facesToNodes[f][q]], localIncrement );
         }
       }
     } ); // end loop over element

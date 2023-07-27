@@ -78,6 +78,8 @@ void AcousticWaveEquationSEM::registerDataOnMesh( Group & meshBodies )
                                fields::StiffnessVector,
                                fields::FreeSurfaceNodeIndicator >( this->getName() );
 
+    nodeManager.registerField< fields::wavesolverfields::DampingVector >( this->getName() );
+
     /// register  PML auxiliary variables only when a PML is specified in the xml
     if( m_usePML )
     {
@@ -268,6 +270,9 @@ void AcousticWaveEquationSEM::initializePostInitialConditionsPreSubGroups()
     // mass matrix to be computed in this function
     arrayView1d< real32 > const mass = nodeManager.getField< fields::MassVector >();
     mass.zero();
+    /// damping matrix to be computed for each dof in the boundary of the mesh
+    arrayView1d< real32 > const damping = nodeManager.getField< fields::DampingVector >();
+    damping.zero();
 
     /// get array of indicators: 1 if face is on the free surface; 0 otherwise
     arrayView1d< localIndex const > const freeSurfaceFaceIndicator = faceManager.getField< fields::FreeSurfaceFaceIndicator >();
@@ -283,15 +288,12 @@ void AcousticWaveEquationSEM::initializePostInitialConditionsPreSubGroups()
       /// Partial gradient if gradient as to be computed
       arrayView1d< real32 > grad = elementSubRegion.getField< fields::PartialGradient >();
       grad.zero();
-      arrayView1d< localIndex const > const nodeToDampingIdx = nodeManager.getField< fields::wavesolverfields::NodeToDampingIndex >();
-
+    
       finiteElement::FiniteElementBase const &
       fe = elementSubRegion.getReference< finiteElement::FiniteElementBase >( getDiscretizationName() );
       finiteElement::FiniteElementDispatchHandler< SEM_FE_TYPES >::dispatch3D( fe, [&] ( auto const finiteElement )
       {
         using FE_TYPE = TYPEOFREF( finiteElement );
-        m_dampingVector.resize( m_dampingNodes.size() );
-        m_dampingVector.zero();
 
         acousticWaveEquationSEMKernels::MassMatrixKernel< FE_TYPE > kernelM( finiteElement );
 
@@ -309,13 +311,12 @@ void AcousticWaveEquationSEM::initializePostInitialConditionsPreSubGroups()
                                                                facesDomainBoundaryIndicator,
                                                                freeSurfaceFaceIndicator,
                                                                velocity,
-                                                               nodeToDampingIdx,
-                                                               m_dampingVector );
+                                                               damping );
         facesToElements.freeOnDevice();
         facesDomainBoundaryIndicator.freeOnDevice();
         freeSurfaceFaceIndicator.freeOnDevice();
         velocity.freeOnDevice();
-        nodeToDampingIdx.freeOnDevice();
+        facesToNodes.freeOnDevice();
       } );
     } );
   } );
@@ -941,6 +942,8 @@ real64 AcousticWaveEquationSEM::explicitStepInternal( real64 const & time_n,
     arrayView1d< localIndex const > const freeSurfaceNodeIndicator = nodeManager.getField< fields::FreeSurfaceNodeIndicator >();
     arrayView1d< real32 > const stiffnessVector = nodeManager.getField< fields::StiffnessVector >();
     arrayView1d< real32 > const rhs = nodeManager.getField< fields::ForcingRHS >();
+    /// damping matrix to be computed for each dof in the boundary of the mesh
+    arrayView1d< real32 > const damping = nodeManager.getField< fields::DampingVector >();
 
     bool const usePML = m_usePML;
 
@@ -973,7 +976,7 @@ real64 AcousticWaveEquationSEM::explicitStepInternal( real64 const & time_n,
       WaveSolverUtils::UpdateP( nodeManager,
                                 p_nm1, p_n, p_np1,
                                 mass, stiffnessVector, rhs,
-                                m_dampingNodes, m_dampingVector,
+                                damping,
                                 dt, stream, events );
       waitAllDeviceEvents( events );
     }

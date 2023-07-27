@@ -231,13 +231,6 @@ private:
   /// Symmetric tensor describing the moment of the source
   R2SymTensor m_sourceMoment;
 
-  /// Damping terms in X direction
-  array1d< real32 > m_dampingVectorX;
-  /// Damping terms in Y direction
-  array1d< real32 > m_dampingVectorY;
-  /// Damping terms in Z direction
-  array1d< real32 > m_dampingVectorZ;
-
 
 };
 

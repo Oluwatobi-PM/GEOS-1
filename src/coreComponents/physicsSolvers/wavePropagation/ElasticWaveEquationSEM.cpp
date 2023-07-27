@@ -207,6 +207,10 @@ void ElasticWaveEquationSEM::registerDataOnMesh( Group & meshBodies )
                                fields::StiffnessVectorz,
                                fields::FreeSurfaceNodeIndicator >( this->getName() );
 
+    nodeManager.registerField< fields::wavesolverfields::DampingVectorX >( this->getName() );
+    nodeManager.registerField< fields::wavesolverfields::DampingVectorY >( this->getName() );
+    nodeManager.registerField< fields::wavesolverfields::DampingVectorZ >( this->getName() );
+
     FaceManager & faceManager = mesh.getFaceManager();
     faceManager.registerField< fields::FreeSurfaceFaceIndicator >( this->getName() );
 
@@ -535,13 +539,12 @@ void ElasticWaveEquationSEM::initializePostInitialConditionsPreSubGroups()
     arrayView1d< real32 > const mass = nodeManager.getField< fields::MassVector >();
     mass.zero();
     /// damping matrix to be computed for each dof in the boundary of the mesh
-    arrayView1d< localIndex > const nodeToDampingIdx = nodeManager.getField< fields::wavesolverfields::NodeToDampingIndex >();
-    m_dampingVectorX.resize( m_dampingNodes.size() );
-    m_dampingVectorY.resize( m_dampingNodes.size() );
-    m_dampingVectorZ.resize( m_dampingNodes.size() );
-    m_dampingVectorX.zero();
-    m_dampingVectorY.zero();
-    m_dampingVectorZ.zero();
+    arrayView1d< real32 > const dampingX = nodeManager.getField< fields::DampingVectorX >();
+    dampingX.zero();
+    arrayView1d< real32 > const dampingY = nodeManager.getField< fields::DampingVectorY >();
+    dampingY.zero();
+    arrayView1d< real32 > const dampingZ = nodeManager.getField< fields::DampingVectorZ >();
+    dampingZ.zero();
 
     /// get array of indicators: 1 if face is on the free surface; 0 otherwise
     arrayView1d< localIndex const > const freeSurfaceFaceIndicator = faceManager.getField< fields::FreeSurfaceFaceIndicator >();
@@ -585,17 +588,15 @@ void ElasticWaveEquationSEM::initializePostInitialConditionsPreSubGroups()
                                                                density,
                                                                velocityVp,
                                                                velocityVs,
-                                                               nodeToDampingIdx,
-                                                               m_dampingVectorX,
-                                                               m_dampingVectorY,
-                                                               m_dampingVectorZ );
+                                                               dampingVectorX,
+                                                               dampingVectorY,
+                                                               dampingVectorZ );
         facesToElements.freeOnDevice();
         facesDomainBoundaryIndicator.freeOnDevice();
         freeSurfaceFaceIndicator.freeOnDevice();
         density.freeOnDevice();
         velocityVp.freeOnDevice();
         velocityVs.freeOnDevice();
-        nodeToDampingIdx.freeOnDevice();
         facesToNodes.freeOnDevice();
 
       } );
@@ -744,6 +745,10 @@ real64 ElasticWaveEquationSEM::explicitStepInternal( real64 const & time_n,
     arrayView1d< real32 > const rhsx = nodeManager.getField< fields::ForcingRHSx >();
     arrayView1d< real32 > const rhsy = nodeManager.getField< fields::ForcingRHSy >();
     arrayView1d< real32 > const rhsz = nodeManager.getField< fields::ForcingRHSz >();
+    /// damping matrix to be computed for each dof in the boundary of the mesh
+    arrayView1d< real32 > const damping = nodeManager.getField< fields::DampingVectorX >();
+    arrayView1d< real32 > const damping = nodeManager.getField< fields::DampingVectorY >();
+    arrayView1d< real32 > const damping = nodeManager.getField< fields::DampingVectorZ >();
 
     auto kernelFactory = elasticWaveEquationSEMKernels::ExplicitElasticSEMFactory( dt );
 
@@ -769,19 +774,19 @@ real64 ElasticWaveEquationSEM::explicitStepInternal( real64 const & time_n,
       WaveSolverUtils::UpdateP( nodeManager,
                                 ux_nm1, ux_n, ux_np1,
                                 mass, stiffnessVectorx, rhsx,
-                                m_dampingNodes, m_dampingVectorX,
+                                dampingVectorX,
                                 dt, streamx, events );
 
       WaveSolverUtils::UpdateP( nodeManager,
                                 uy_nm1, uy_n, uy_np1,
                                 mass, stiffnessVectory, rhsy,
-                                m_dampingNodes, m_dampingVectorY,
+                                dampingVectorY,
                                 dt, streamy, events );
 
       WaveSolverUtils::UpdateP( nodeManager,
                                 uz_nm1, uz_n, uz_np1,
                                 mass, stiffnessVectorz, rhsz,
-                                m_dampingNodes, m_dampingVectorZ,
+                                dampingVectorZ,
                                 dt, streamz, events );
       waitAllDeviceEvents( events );
     }
