@@ -3,7 +3,7 @@
 Using GEOS on Stanford *Sherlock* cluster
 ===========================================
 
-*Sherlock*  is the new Stanford mixed CPU/GPU `cluster<https://www.sherlock.stanford.edu/docs/tech/#in-a-nutshell>`_ that is usable on request
+*Sherlock*  is the new Stanford mixed CPU/GPU `cluster <https://www.sherlock.stanford.edu/docs/tech/#in-a-nutshell>`_ that is usable on request
 for students. 
 
 There is two main user profile on *Sherlock* that can be interested in different
@@ -11,6 +11,7 @@ deployement of *GEOS*:
 
     - _Users_, who are only interested in running the current version of develop
     on multi-core/multi-gpu arch to get the most of the HPC.
+
     - _Developers_ and code wonderers, who wants to explore code, run test branches
     and even develop on premise. 
 
