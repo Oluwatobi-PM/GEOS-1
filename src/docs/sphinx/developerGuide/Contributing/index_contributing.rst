@@ -26,3 +26,7 @@ Contributing
    UsingDocker.rst
 
    InstallWin.rst
+
+   UsingSingularity.rst
+
+   GEOSOnSherlock.rst
