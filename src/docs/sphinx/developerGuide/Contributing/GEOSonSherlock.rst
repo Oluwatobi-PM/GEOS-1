@@ -17,6 +17,15 @@ deployement of *GEOS*:
 
 Both profile will be interested in finding pre-compiled and deployed version of
 the most recent thirdPartyLibs (to the exception of development in these thirdPartyLibs).
+In a cluster environment, the path resolution goes through a module loader. It can be triggered module by module 
+
+.. code-block::
+    :caption: example of module load
+    module load gcc
+
+Once the complete set of required modules is loaded, the state can be saved into a readeable `.lua` file thanks to the `module save <tag>`.
+This file is save user-wise at `$HOME/.lmod.d/`. Such module list used to compile and run different version of GEOS are stored in `/oak/stanford/schools/ees/COLLABORATIONS/geosx/lua`.
+They can serve as examples or be copied over for tests.
 
 Auto-deployement of pre-compiled binaries
 ---------------------------------------------
