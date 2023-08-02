@@ -1050,10 +1050,6 @@ void VTKPolyDataWriterInterface::writeUnstructuredGrid( string const & path,
   aggregate->SetMergePoints( false );
   aggregate->Update();
 
-  std::cout << "aggregate->GetOutput())->GetNumberOfPoints(): " << vtkDataSet::SafeDownCast( aggregate->GetOutput())->GetNumberOfPoints() << std::endl;
-
-  // int globalCommRank;
-
   int localCommRank = -1;
   if( vtkDataSet::SafeDownCast( aggregate->GetOutput())->GetNumberOfPoints() != 0 )
   {
