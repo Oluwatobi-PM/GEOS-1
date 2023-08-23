@@ -9,7 +9,7 @@ name                string               required A name is required for any non
 upwindingScheme     geos_UpwindingScheme PPU      | Type of upwinding scheme. Valid options:                        
                                                   | * PPU                                                           
                                                   | * C1PPU                                                         
-                                                  | * IHU                                                           
+                                                  | * IHUPPU
 usePEDFM            integer              0        (no description available)                                      
 =================== ==================== ======== =============================================================== 
 

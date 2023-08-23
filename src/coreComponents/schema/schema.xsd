@@ -1770,7 +1770,7 @@ the relative residual norm satisfies:
 		<!--upwindingScheme => Type of upwinding scheme. Valid options:
 * PPU
 * C1PPU
-* IHU-->
+* IHUPPU-->
 		<xsd:attribute name="upwindingScheme" type="geos_UpwindingScheme" default="PPU" />
 		<!--usePEDFM => (no description available)-->
 		<xsd:attribute name="usePEDFM" type="integer" default="0" />
@@ -1779,7 +1779,7 @@ the relative residual norm satisfies:
 	</xsd:complexType>
 	<xsd:simpleType name="geos_UpwindingScheme">
 		<xsd:restriction base="xsd:string">
-			<xsd:pattern value=".*[\[\]`$].*|PPU|C1PPU|IHU" />
+			<xsd:pattern value=".*[\[\]`$].*|PPU|C1PPU|IHUPPU" />
 		</xsd:restriction>
 	</xsd:simpleType>
 	<xsd:complexType name="OutputsType">
