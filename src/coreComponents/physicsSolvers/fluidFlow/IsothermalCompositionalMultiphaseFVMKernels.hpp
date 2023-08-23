@@ -1221,20 +1221,31 @@ public:
                            dt, localMatrix, localRhs );
         kernelType::template launch< POLICY >( stencilWrapper.size(), kernel );
       }
-      else if( upwindingParams.upwindingScheme == UpwindingScheme::IHU )
-      {
-        using kernelType = FaceBasedAssemblyKernel< NUM_COMP, NUM_DOF, STENCILWRAPPER, isothermalCompositionalMultiphaseFVMKernelUtilities::IHUPhaseFlux >;
-        typename kernelType::CompFlowAccessors compFlowAccessors( elemManager, solverName );
-        typename kernelType::MultiFluidAccessors multiFluidAccessors( elemManager, solverName );
-        typename kernelType::CapPressureAccessors capPressureAccessors( elemManager, solverName );
-        typename kernelType::PermeabilityAccessors permeabilityAccessors( elemManager, solverName );
+      else if( upwindingParams.upwindingScheme == UpwindingScheme::IHUPPU ) {
+          using kernelType = FaceBasedAssemblyKernel<NUM_COMP, NUM_DOF, STENCILWRAPPER, isothermalCompositionalMultiphaseFVMKernelUtilities::IHUPPUPhaseFlux>;
+          typename kernelType::CompFlowAccessors compFlowAccessors(elemManager, solverName);
+          typename kernelType::MultiFluidAccessors multiFluidAccessors(elemManager, solverName);
+          typename kernelType::CapPressureAccessors capPressureAccessors(elemManager, solverName);
+          typename kernelType::PermeabilityAccessors permeabilityAccessors(elemManager, solverName);
 
-        kernelType kernel( numPhases, rankOffset, hasCapPressure, /*upwindingParams.epsC1PPU,*/ stencilWrapper, dofNumberAccessor,
-                           compFlowAccessors, multiFluidAccessors, capPressureAccessors, permeabilityAccessors,
-                           dt, localMatrix, localRhs );
-        kernelType::template launch< POLICY >( stencilWrapper.size(), kernel );
+          kernelType kernel(numPhases, rankOffset, hasCapPressure, /*upwindingParams.epsC1PPU,*/ stencilWrapper,
+                            dofNumberAccessor,
+                            compFlowAccessors, multiFluidAccessors, capPressureAccessors, permeabilityAccessors,
+                            dt, localMatrix, localRhs);
+          kernelType::template launch<POLICY>(stencilWrapper.size(), kernel);
+      }
+      else if( upwindingParams.upwindingScheme == UpwindingScheme::IHUAA ) {
+          using kernelType = FaceBasedAssemblyKernel<NUM_COMP, NUM_DOF, STENCILWRAPPER, isothermalCompositionalMultiphaseFVMKernelUtilities::IHUAAPhaseFlux>;
+          typename kernelType::CompFlowAccessors compFlowAccessors(elemManager, solverName);
+          typename kernelType::MultiFluidAccessors multiFluidAccessors(elemManager, solverName);
+          typename kernelType::CapPressureAccessors capPressureAccessors(elemManager, solverName);
+          typename kernelType::PermeabilityAccessors permeabilityAccessors(elemManager, solverName);
 
-
+          kernelType kernel(numPhases, rankOffset, hasCapPressure, /*upwindingParams.epsC1PPU,*/ stencilWrapper,
+                            dofNumberAccessor,
+                            compFlowAccessors, multiFluidAccessors, capPressureAccessors, permeabilityAccessors,
+                            dt, localMatrix, localRhs);
+          kernelType::template launch<POLICY>(stencilWrapper.size(), kernel);
       }
       else
       {

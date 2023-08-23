@@ -74,7 +74,7 @@ char const *xmlInput =
   "  <NumericalMethods>\n"
   "    <FiniteVolume>\n"
   "      <TwoPointFluxApproximation name=\"fluidTPFA\""
-  "         upwindingScheme=\"IHU\"/>\n"
+  "         upwindingScheme=\"IHUPPU\"/>\n"
   "    </FiniteVolume>\n"
   "  </NumericalMethods>\n"
   "  <ElementRegions>\n"
