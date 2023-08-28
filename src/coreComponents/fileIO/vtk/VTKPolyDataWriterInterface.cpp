@@ -1037,14 +1037,13 @@ void VTKPolyDataWriterInterface::writeUnstructuredGrid( string const & path,
   }
 
   filter->SetInputDataObject( ug );
-  // filter->Update();
 
   vtkSmartPointer< vtkMultiProcessController > controller = vtk::getController();
   vtkMultiProcessController::SetGlobalController( controller );
 
-
+  // In case of m_numberOfTargetProcesses == GetNumberOfProcesses the filter returns a shallow copy
+  // The behavior  is the same as previously in this case. The rank number is computed instead of implicitly written
   vtkNew< vtkAggregateDataSetFilter > aggregate;
-  // aggregate->SetInputDataObject(ug);
   aggregate->SetInputConnection( filter->GetOutputPort());
   aggregate->SetNumberOfTargetProcesses( m_numberOfTargetProcesses );
   aggregate->SetMergePoints( false );
@@ -1065,7 +1064,6 @@ void VTKPolyDataWriterInterface::writeUnstructuredGrid( string const & path,
 
   const int size = MpiWrapper::commSize( MPI_COMM_GEOSX );
   std::vector< int > globalValues( size );
-
 
   // Everything is done on rank 0
   MpiWrapper::gather( &localCommRank,
