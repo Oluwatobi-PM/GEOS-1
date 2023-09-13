@@ -90,10 +90,10 @@ void AcousticVTIDensityWaveEquationSEM::registerDataOnMesh( Group & meshBodies )
 
     elemManager.forElementSubRegions< CellElementSubRegion >( [&]( CellElementSubRegion & subRegion )
     {
+      subRegion.registerField< fields::wavesolverfields::MediumVelocity >( this->getName() );
+      subRegion.registerField< fields::wavesolverfields::MediumDensity >( this->getName() );
       subRegion.registerField< fields::wavesolverfields::Delta >( this->getName() );
       subRegion.registerField< fields::wavesolverfields::Epsilon >( this->getName() );
-      subRegion.registerField< fields::wavesolverfields::F >( this->getName() );
-      subRegion.registerField< fields::wavesolverfields::MediumVelocity >( this->getName() );
     } );
   } );
 }
@@ -276,9 +276,9 @@ void AcousticVTIDensityWaveEquationSEM::initializePostInitialConditionsPreSubGro
       arrayView2d< localIndex const, cells::NODE_MAP_USD > const elemsToNodes = elementSubRegion.nodeList();
       arrayView2d< localIndex const > const facesToElements = faceManager.elementList();
       arrayView1d< real32 const > const velocity = elementSubRegion.getField< fields::wavesolverfields::MediumVelocity >();
+      arrayView1d< real32 const > const density  = elementSubRegion.getField< fields::wavesolverfields::MediumDensity >();
       arrayView1d< real32 const > const epsilon  = elementSubRegion.getField< fields::wavesolverfields::Epsilon >();
       arrayView1d< real32 const > const delta    = elementSubRegion.getField< fields::wavesolverfields::Delta >();
-      arrayView1d< real32 const > const vti_f    = elementSubRegion.getField< fields::wavesolverfields::F >();
 
       finiteElement::FiniteElementBase const &
       fe = elementSubRegion.getReference< finiteElement::FiniteElementBase >( getDiscretizationName() );
@@ -292,6 +292,7 @@ void AcousticVTIDensityWaveEquationSEM::initializePostInitialConditionsPreSubGro
                                                                X32,
                                                                elemsToNodes,
                                                                velocity,
+                                                               density,
                                                                mass );
 
         AcousticVTIDensityWaveEquationSEMKernels::DampingMatrixKernel< FE_TYPE > kernelD( finiteElement );
@@ -305,9 +306,9 @@ void AcousticVTIDensityWaveEquationSEM::initializePostInitialConditionsPreSubGro
                                                                lateralSurfaceFaceIndicator,
                                                                bottomSurfaceFaceIndicator,
                                                                velocity,
+                                                               density,
                                                                epsilon,
                                                                delta,
-                                                               vti_f,
                                                                damping_p,
                                                                damping_q,
                                                                damping_pq,
@@ -617,20 +618,16 @@ real64 AcousticVTIDensityWaveEquationSEM::explicitStepInternal( real64 const & t
           // Boundary node
           p_np1[a] += damping_p[a]*p_nm1[a]/dt/2;
           p_np1[a] += damping_pq[a]*q_nm1[a]/dt/2;
-
           q_np1[a] += damping_q[a]*q_nm1[a]/dt/2;
           q_np1[a] += damping_qp[a]*p_nm1[a]/dt/2;
           // Hand-made Inversion of 2x2 matrix
           real32 coef_pp = mass[a]/dt2;
           coef_pp += damping_p[a]/dt/2;
           real32 coef_pq = damping_pq[a]/dt/2;
-
           real32 coef_qq = mass[a]/dt2;
           coef_qq += damping_q[a]/2/dt;
           real32 coef_qp = damping_qp[a]/dt/2;
-
           real32 det_pq = 1/(coef_pp * coef_qq - coef_pq*coef_qp);
-
           real32 aux_p_np1 = p_np1[a];
           p_np1[a] = det_pq*(coef_qq*p_np1[a] - coef_pq*q_np1[a]);
           q_np1[a] = det_pq*(coef_pp*q_np1[a] - coef_qp*aux_p_np1);
